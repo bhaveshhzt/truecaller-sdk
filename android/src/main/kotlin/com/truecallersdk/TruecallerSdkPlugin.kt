@@ -311,7 +311,7 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        return if (requestCode == TruecallerSDK.SHARE_PROFILE_REQUEST_CODE) {
+        return if (requestCode == TruecallerSDK.SHARE_PROFILE_REQUEST_CODE && TruecallerSDK.getInstance() != null && TruecallerSDK.getInstance().isUsable) {
             TruecallerSDK.getInstance().onActivityResultObtained(activity as FragmentActivity, requestCode, resultCode, data)
         } else false
     }
