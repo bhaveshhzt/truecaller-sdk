@@ -114,7 +114,10 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
         when (call.method) {
             INITIATE_SDK -> {
-                getTrueScope(call)?.let { TruecallerSDK.init(it) } ?: result.error("UNAVAILABLE", "Activity not available.", null)
+                Thread {
+                    getTrueScope(call)?.let { TruecallerSDK.init(it) }
+                        ?: result.error("UNAVAILABLE", "Activity not available.", null)
+                }.start()
             }
             IS_USABLE -> {
                 result.success(TruecallerSDK.getInstance() != null && TruecallerSDK.getInstance().isUsable)
@@ -128,11 +131,15 @@ public class TruecallerSdkPlugin : FlutterPlugin, MethodCallHandler, EventChanne
                 }
             }
             GET_PROFILE -> {
-                activity?.let { TruecallerSDK.getInstance().getUserProfile(it as FragmentActivity) } ?: result.error(
-                    "UNAVAILABLE",
-                    "Activity not available.",
-                    null
-                )
+                Thread {
+                    activity?.let {
+                        TruecallerSDK.getInstance().getUserProfile(it as FragmentActivity)
+                    } ?: result.error(
+                        "UNAVAILABLE",
+                        "Activity not available.",
+                        null
+                    )
+                }.start()
             }
             REQUEST_VERIFICATION -> {
                 val phoneNumber = call.argument<String>(Constants.PH_NO)?.takeUnless(String::isBlank)
